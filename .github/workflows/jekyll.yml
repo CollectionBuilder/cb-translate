@@ -26,66 +26,67 @@ jobs:
         with:
           ruby-version: '3.1'
           bundler-cache: true
-
+          
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
 
-      # Build for English
-      - name: Set English lang in config
-        run: |
-          sed -i "/^lang:/c\lang: en" _config.yml
-
-      - name: Build English Site
+      - name: Build with Jekyll
         run: bundle exec jekyll build --destination _site/en --baseurl "${{ steps.pages.outputs.base_path }}/en"
         env:
           JEKYLL_ENV: production
 
-      # Build for German
-      - name: Set German lang in config
+      - name: Set lang to de
         run: |
           sed -i "/^lang:/c\lang: de" _config.yml
-
-      - name: Build German Site
+          if ! grep -q "^lang:" _config.yml; then
+            echo "lang: de" >> _config.yml
+          fi
+      - name: Build with Jekyll
         run: bundle exec jekyll build --destination _site/de --baseurl "${{ steps.pages.outputs.base_path }}/de"
         env:
           JEKYLL_ENV: production
 
-      # Build for Spanish
-      - name: Set Spanish lang in config
+      - name: Set lang to es
         run: |
           sed -i "/^lang:/c\lang: es" _config.yml
-
-      - name: Build Spanish Site
+          if ! grep -q "^lang:" _config.yml; then
+            echo "lang: es" >> _config.yml
+          fi
+      - name: Build with Jekyll
         run: bundle exec jekyll build --destination _site/es --baseurl "${{ steps.pages.outputs.base_path }}/es"
         env:
           JEKYLL_ENV: production
 
-      # Create index.html
       - name: Create index.html
         run: |
-          echo '<!DOCTYPE html>' > _site/index.html
-          echo '<html lang="en">' >> _site/index.html
-          echo '<head>' >> _site/index.html
-          echo '    <meta charset="UTF-8">' >> _site/index.html
-          echo '    <meta name="viewport" content="width=device-width, initial-scale=1.0">' >> _site/index.html
-          echo '    <title>Welcome to Our Multilingual Site</title>' >> _site/index.html
-          echo '</head>' >> _site/index.html
-          echo '<body>' >> _site/index.html
-          echo '    <h1>Welcome to Our Multilingual Site</h1>' >> _site/index.html
-          echo '    <ul>' >> _site/index.html
-          echo '        <li><a href="de/">Deutsch</a></li>' >> _site/index.html
-          echo '        <li><a href="en/">English</a></li>' >> _site/index.html
-          echo '        <li><a href="es/">Español</a></li>' >> _site/index.html
-          echo '    </ul>' >> _site/index.html
-          echo '</body>' >> _site/index.html
-          echo '</html>' >> _site/index.html
+          echo '<!DOCTYPE html>' > index.html
+          echo '<html lang="en">' >> index.html
+          echo '<head>' >> index.html
+          echo '    <meta charset="UTF-8">' >> index.html
+          echo '    <meta name="viewport" content="width=device-width, initial-scale=1.0">' >> index.html
+          echo '    <title>Welcome to Our Multilingual Site</title>' >> index.html
+          echo '</head>' >> index.html
+          echo '<body>' >> index.html
+          echo '    <h1>Welcome to Our Multilingual Site</h1>' >> index.html
+          echo '    <ul>' >> index.html
+          echo '        <li><a href="de/">Deutsch</a></li>' >> index.html
+          echo '        <li><a href="en/">English</a></li>' >> index.html
+          echo '        <li><a href="es/">Español</a></li>' >> index.html
+          echo '    </ul>' >> index.html
+          echo '</body>' >> index.html
+          echo '</html>' >> index.html
+          mv index.html _site/
+          
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
     environment:
       name: github-pages
