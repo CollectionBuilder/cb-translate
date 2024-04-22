@@ -53,7 +53,6 @@ jobs:
           name: site-${{ matrix.lang }}
 
   create-index:
-    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Create index.html
@@ -84,22 +83,40 @@ jobs:
           name: site
 
   deploy:
-    needs: create-index
+    needs: [build, create-index]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download all artifacts
+      - name: Download English site artifact
         uses: actions/download-artifact@v4
         with:
+          name: site-en
+          path: _site/en
+
+      - name: Download German site artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site-de
+          path: _site/de
+
+      - name: Download Spanish site artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site-es
+          path: _site/es
+
+      - name: Download Index site artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site
           path: _site
-          merge-multiple: true
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
         with:
-          artifact_name: site
+          path: _site
           
     environment:
       name: github-pages
