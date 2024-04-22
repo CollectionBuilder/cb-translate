@@ -32,7 +32,10 @@ jobs:
 
       - name: Set language in config
         run: |
-          echo "lang: ${{ matrix.lang }}" >> _config.yml
+          sed -i "/^lang:/c\lang: ${{ matrix.lang }}" _config.yml
+          if ! grep -q "^lang:" _config.yml; then
+            echo "lang: ${{ matrix.lang }}" >> _config.yml
+          fi
           
       - name: Setup Pages
         id: pages
