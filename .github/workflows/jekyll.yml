@@ -17,9 +17,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        lang: ['en', 'de', 'es']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,49 +26,60 @@ jobs:
         with:
           ruby-version: '3.1'
           bundler-cache: true
-          
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
 
-      - name: Prepare lang-specific config
+      # Build for English
+      - name: Set English lang in config
         run: |
-          sed -i "/^lang:/c\lang: ${{ matrix.lang }}" _config.yml
-          if ! grep -q "^lang:" _config.yml; then
-            echo "lang: ${{ matrix.lang }}" >> _config.yml
-          fi
+          sed -i "/^lang:/c\lang: en" _config.yml
 
-      - name: Build with Jekyll
-        run: bundle exec jekyll build --destination _site/${{ matrix.lang }} --baseurl "${{ steps.pages.outputs.base_path }}/${{ matrix.lang }}"
+      - name: Build English Site
+        run: bundle exec jekyll build --destination _site/en --baseurl "${{ steps.pages.outputs.base_path }}/en"
         env:
           JEKYLL_ENV: production
 
-      - name: Create index.html if first run
-        if: matrix.lang == 'en'
+      # Build for German
+      - name: Set German lang in config
         run: |
-          echo '<!DOCTYPE html>' > index.html
-          echo '<html lang="en">' >> index.html
-          echo '<head>' >> index.html
-          echo '    <meta charset="UTF-8">' >> index.html
-          echo '    <meta name="viewport" content="width=device-width, initial-scale=1.0">' >> index.html
-          echo '    <title>Welcome to Our Multilingual Site</title>' >> index.html
-          echo '</head>' >> index.html
-          echo '<body>' >> index.html
-          echo '    <h1>Welcome to Our Multilingual Site</h1>' >> index.html
-          echo '    <ul>' >> index.html
-          echo '        <li><a href="de/">Deutsch</a></li>' >> index.html
-          echo '        <li><a href="en/">English</a></li>' >> index.html
-          echo '        <li><a href="es/">Español</a></li>' >> index.html
-          echo '    </ul>' >> index.html
-          echo '</body>' >> index.html
-          echo '</html>' >> index.html
-          mv index.html _site/
+          sed -i "/^lang:/c\lang: de" _config.yml
 
-      - name: Upload artifacts
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./_site
-          name: site-content
+      - name: Build German Site
+        run: bundle exec jekyll build --destination _site/de --baseurl "${{ steps.pages.outputs.base_path }}/de"
+        env:
+          JEKYLL_ENV: production
+
+      # Build for Spanish
+      - name: Set Spanish lang in config
+        run: |
+          sed -i "/^lang:/c\lang: es" _config.yml
+
+      - name: Build Spanish Site
+        run: bundle exec jekyll build --destination _site/es --baseurl "${{ steps.pages.outputs.base_path }}/es"
+        env:
+          JEKYLL_ENV: production
+
+      # Create index.html
+      - name: Create index.html
+        run: |
+          echo '<!DOCTYPE html>' > _site/index.html
+          echo '<html lang="en">' >> _site/index.html
+          echo '<head>' >> _site/index.html
+          echo '    <meta charset="UTF-8">' >> _site/index.html
+          echo '    <meta name="viewport" content="width=device-width, initial-scale=1.0">' >> _site/index.html
+          echo '    <title>Welcome to Our Multilingual Site</title>' >> _site/index.html
+          echo '</head>' >> _site/index.html
+          echo '<body>' >> _site/index.html
+          echo '    <h1>Welcome to Our Multilingual Site</h1>' >> _site/index.html
+          echo '    <ul>' >> _site/index.html
+          echo '        <li><a href="de/">Deutsch</a></li>' >> _site/index.html
+          echo '        <li><a href="en/">English</a></li>' >> _site/index.html
+          echo '        <li><a href="es/">Español</a></li>' >> _site/index.html
+          echo '    </ul>' >> _site/index.html
+          echo '</body>' >> _site/index.html
+          echo '</html>' >> _site/index.html
 
   deploy:
     needs: build
