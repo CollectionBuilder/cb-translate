@@ -76,6 +76,7 @@ jobs:
           echo '</html>' >> index.html
           mkdir _site
           mv index.html _site/
+          
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -99,3 +100,7 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           artifact_name: site
+          
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
