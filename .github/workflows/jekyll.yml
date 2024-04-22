@@ -64,9 +64,11 @@ jobs:
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v3
-        with:
-          name: site-${{ matrix.lang }}
-          path: _site
+        # with:
+        #   name: site-${{ matrix.lang }}
+        #   path: _site
+
+      - run: ls -la
           
       - name: Deploy to GitHub Pages
         id: deployment
