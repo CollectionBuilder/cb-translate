@@ -64,13 +64,12 @@ jobs:
         with:
           path: _site
 
-      - name: Extract and organize artifacts
+      - name: Unzip all ZIP files
         run: |
-          mkdir -p _site/en _site/de _site/es
-          unzip 'site-en.zip' -d _site/en
-          unzip 'site-de.zip' -d _site/de
-          unzip 'site-es.zip' -d _site/es
-          rm -f site-*.zip
+          for zip in *.zip; do
+            unzip "$zip" -d "${zip%.*}"
+            rm -f $zip
+          done
 
       - name: Create index.html
         run: |
