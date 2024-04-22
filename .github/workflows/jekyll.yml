@@ -10,9 +10,9 @@ permissions:
   pages: write
   id-token: write
 
-# concurrency:
-#   group: "pages-${{ github.ref }}"
-#   cancel-in-progress: false
+concurrency:
+  group: "pages-${{ github.ref }}"
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -63,7 +63,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: site-${{ matrix.lang }}
           path: _site
