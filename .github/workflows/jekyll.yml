@@ -72,9 +72,9 @@ jobs:
           echo '<body>' >> index.html
           echo '    <h1>Welcome to Our Multilingual Site</h1>' >> index.html
           echo '    <ul>' >> index.html
-          echo '        <li><a href="../de/">Deutsch</a></li>' >> index.html
-          echo '        <li><a href="../en/">English</a></li>' >> index.html
-          echo '        <li><a href="../es/">Español</a></li>' >> index.html
+          echo '        <li><a href="de/">Deutsch</a></li>' >> index.html
+          echo '        <li><a href="en/">English</a></li>' >> index.html
+          echo '        <li><a href="es/">Español</a></li>' >> index.html
           echo '    </ul>' >> index.html
           echo '</body>' >> index.html
           echo '</html>' >> index.html
