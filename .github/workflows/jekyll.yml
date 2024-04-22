@@ -113,10 +113,12 @@ jobs:
           name: site
           path: _site
 
+      - name: Zip the _site directory for deployment
+        run: zip -r github-pages.zip _site
+
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
-        with:
-          path: _site
+        id: deployment
           
     environment:
       name: github-pages
