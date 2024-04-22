@@ -64,7 +64,36 @@ jobs:
         with:
           path: _site
 
+      - name: Extract and organize artifacts
+        run: |
+          mkdir -p _site/en _site/de _site/es
+          unzip 'site-en.zip' -d _site/en
+          unzip 'site-de.zip' -d _site/de
+          unzip 'site-es.zip' -d _site/es
+          rm -f site-*.zip
+
+      - name: Create index.html
+        run: |
+          echo '<!DOCTYPE html>' > index.html
+          echo '<html lang="en">' >> index.html
+          echo '<head>' >> index.html
+          echo '    <meta charset="UTF-8">' >> index.html
+          echo '    <meta name="viewport" content="width=device-width, initial-scale=1.0">' >> index.html
+          echo '    <title>Welcome to Our Multilingual Site</title>' >> index.html
+          echo '</head>' >> index.html
+          echo '<body>' >> index.html
+          echo '    <h1>Welcome to Our Multilingual Site</h1>' >> index.html
+          echo '    <ul>' >> index.html
+          echo '        <li><a href="/de/">Deutsch</a></li>' >> index.html
+          echo '        <li><a href="/en/">English</a></li>' >> index.html
+          echo '        <li><a href="/es/">Español</a></li>' >> index.html
+          echo '    </ul>' >> index.html
+          echo '</body>' >> index.html
+          echo '</html>' >> index.html
+          mv index.html _site/
+
+      - name: Zip the site for deployment
+        run: zip -r github-pages.zip _site
+
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
-        with:
-          path: _site
