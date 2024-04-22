@@ -66,6 +66,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: site-${{ matrix.lang }}
+          path: _site
           
       - name: Deploy to GitHub Pages
         id: deployment
