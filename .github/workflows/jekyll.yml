@@ -17,6 +17,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lang: ['en', 'de', 'es']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,36 +34,20 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
-      - name: Build with Jekyll
-        run: bundle exec jekyll build --destination _site/en --baseurl "${{ steps.pages.outputs.base_path }}/en"
-        env:
-          JEKYLL_ENV: production
-
-      - name: Set lang to de
+      - name: Prepare lang-specific config
         run: |
-          sed -i "/^lang:/c\lang: de" _config.yml
+          sed -i "/^lang:/c\lang: ${{ matrix.lang }}" _config.yml
           if ! grep -q "^lang:" _config.yml; then
-            echo "lang: de" >> _config.yml
+            echo "lang: ${{ matrix.lang }}" >> _config.yml
           fi
 
       - name: Build with Jekyll
-        run: bundle exec jekyll build --destination _site/de --baseurl "${{ steps.pages.outputs.base_path }}/de"
+        run: bundle exec jekyll build --destination _site/${{ matrix.lang }} --baseurl "${{ steps.pages.outputs.base_path }}/${{ matrix.lang }}"
         env:
           JEKYLL_ENV: production
 
-      - name: Set lang to es
-        run: |
-          sed -i "/^lang:/c\lang: es" _config.yml
-          if ! grep -q "^lang:" _config.yml; then
-            echo "lang: es" >> _config.yml
-          fi
-
-      - name: Build with Jekyll
-        run: bundle exec jekyll build --destination _site/es --baseurl "${{ steps.pages.outputs.base_path }}/es"
-        env:
-          JEKYLL_ENV: production
-
-      - name: Create index.html
+      - name: Create index.html if first run
+        if: matrix.lang == 'en'
         run: |
           echo '<!DOCTYPE html>' > index.html
           echo '<html lang="en">' >> index.html
@@ -79,16 +66,18 @@ jobs:
           echo '</body>' >> index.html
           echo '</html>' >> index.html
           mv index.html _site/
-          
-      - name: Upload artifact
+
+      - name: Upload artifacts
         uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+          name: site-content
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
     environment:
       name: github-pages
